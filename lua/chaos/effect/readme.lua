@@ -1,0 +1,3 @@
+--This lua does nothing
+--Put your custom effects to custom.
+--THE END OF README.lUA
