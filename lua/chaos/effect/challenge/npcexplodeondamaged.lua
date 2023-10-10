@@ -6,6 +6,10 @@ effect.startfunc=function(e)
     if(CLIENT)then return end
     hook.Add("EntityTakeDamage",hookname,function(NPC,dmg)
         if(NPC:IsNPC())then
+            local attacker=dmg:GetAttacker()
+            if(attacker:IsNPC() and attacker:Health()<0 or attacker:Health()==0)then
+                return
+            end
             local effectData = EffectData()
             effectData:SetOrigin( NPC:GetPos() )
             util.Effect( "cball_explode", effectData )
@@ -13,7 +17,6 @@ effect.startfunc=function(e)
             local edmg=NPC:Health()
             e.SetColor(NPC,Color(0,127,255))
             e.NextThink(NPC,CurTime()+1e9)
-            local attacker=dmg:GetAttacker()
             timer.Simple(0.3,function()
                 util.BlastDamage(attacker,attacker,pos,100,edmg)
             end)
