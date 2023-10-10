@@ -10,11 +10,11 @@ effect.startfunc=function(e)
             effectData:SetOrigin( NPC:GetPos() )
             util.Effect( "cball_explode", effectData )
             local pos=NPC:GetPos()
-            local dmg=NPC:Health()
-            e.SetColor(Color(0,127,255))
+            local edmg=NPC:Health()
+            e.SetColor(NPC,Color(0,127,255))
             e.NextThink(NPC,CurTime()+1e9)
             timer.Simple(0.3,function()
-                util.BlastDamage(dmg:GetInflictor(),dmg:GetAttacker(),pos,500,dmg)
+                util.BlastDamage(dmg:GetInflictor(),dmg:GetAttacker(),pos,100,edmg)
             end)
         end
     end)
@@ -24,6 +24,6 @@ effect.endfunc=function(e)
     hook.Remove("EntityTakeDamage",hookname)
 end
 effect.internalmul=1.25
-effect.name="Npc Freezes on damaged"
+effect.name="Npc explode on damaged"
 effect.showeffecttime=true
 CHAOS.AddEffect(effect)
