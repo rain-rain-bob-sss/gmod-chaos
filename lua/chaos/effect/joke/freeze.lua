@@ -9,7 +9,7 @@ effect.startfunc=function(e)
             local effectData = EffectData()
             effectData:SetOrigin( NPC:GetPos() )
             util.Effect( "GunshipImpact", effectData )
-            e.SetColor(Color(0,127,255))
+            e.SetColor(NPC,Color(0,127,255))
             e.NextThink(NPC,CurTime()+1e9)
         end
     end)
