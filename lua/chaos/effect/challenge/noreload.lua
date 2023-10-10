@@ -14,7 +14,7 @@ effect.startfunc=function()
 end
 effect.endfunc=function()
     if(CLIENT)then return end
-    hook.Remove("SetupMove",hookname)
+    hook.Remove("StartCommand",hookname)
 end
 effect.internalmul=0.2
 effect.name="NO PRESSING RELOAD."

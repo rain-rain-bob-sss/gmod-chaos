@@ -1,7 +1,6 @@
 AddCSLuaFile()
 local effect=table.Copy(CHAOS.BASEEFFECT)
 local nextthink=3
-local hookname="Chaos_ONESHOT"
 effect.tickfunc=function(e)
     if(CLIENT)then return end
     for i,v in pairs(ents.FindByClass("npc_*"))do

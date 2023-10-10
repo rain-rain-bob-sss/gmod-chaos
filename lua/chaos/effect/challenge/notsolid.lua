@@ -17,5 +17,5 @@ effect.endfunc=function()
 end
 effect.internalmul=0.5
 effect.name="Player is not solid"
-effect.showeffecttime=false
+effect.showeffecttime=true
 CHAOS.AddEffect(effect)
