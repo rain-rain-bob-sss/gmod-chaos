@@ -19,9 +19,10 @@ CHAOS.DELTATIME=0
 CHAOS.BHOP=true
 hook.Add("StartCommand","CHAOS_BHOPING",function(ply,cmd) 
     if (bit.band(cmd:GetButtons(),IN_JUMP)~=0) then
-    if(not ply:IsOnGround() and ply:GetMoveType() ~= MOVETYPE_LADDER and ply:GetMoveType() ~= MOVETYPE_NOCLIP and ply:WaterLevel()<2) then
-        cmd:SetButtons(bit.band(cmd:GetButtons(),bit.bnot(IN_JUMP)))
-    end
+	    if(not ply:IsOnGround() and ply:GetMoveType() ~= MOVETYPE_LADDER and ply:GetMoveType() ~= MOVETYPE_NOCLIP and ply:WaterLevel()<2) then
+	        cmd:SetButtons(bit.band(cmd:GetButtons(),bit.bnot(IN_JUMP)))
+	    end
+	end
 end)
 --funcs's arg is entity metatable,player meta table,weapon meta table
 --tick func's last arg is sec left.
