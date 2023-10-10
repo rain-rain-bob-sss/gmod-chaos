@@ -1,7 +1,8 @@
 AddCSLuaFile()
 local effect=table.Copy(CHAOS.BASEEFFECT)
-local nextthink=3
+local nextthink=1e9
 local hookname="Chaos_explodeondamaged"
+local anticrash=0
 effect.startfunc=function(e)
     if(CLIENT)then return end
     hook.Add("EntityTakeDamage",hookname,function(NPC,dmg)
@@ -16,9 +17,14 @@ effect.startfunc=function(e)
             local pos=NPC:GetPos()
             local edmg=NPC:Health()
             e.SetColor(NPC,Color(0,127,255))
-            e.NextThink(NPC,CurTime()+1e9)
+            e.NextThink(NPC,CurTime()+nextthink)
             timer.Simple(0.3,function()
+                if(anticrash>10)then return end
                 util.BlastDamage(attacker,attacker,pos,100,edmg)
+                anticrash=anticrash+1
+                timer.Create("CHAOS_RESETANTICRASHOFNEOD",0.5,0,function()
+                    anticrash=0
+                end)
             end)
         end
     end)
