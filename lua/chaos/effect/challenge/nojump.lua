@@ -2,7 +2,7 @@ AddCSLuaFile()
 local effect=table.Copy(CHAOS.BASEEFFECT)
 local hookname="Chaos_You may not jump."
 local CMoveData = FindMetaTable("CMoveData")
-
+CHAOS.NOJUMP=false
 function CMoveData:RemoveKeys(keys)
 	-- Using bitwise operations to clear the key bits.
 	local newbuttons = bit.band(self:GetButtons(), bit.bnot(keys))
@@ -17,10 +17,12 @@ effect.startfunc=function()
             --ply:ChatPrint("You may not jump.")
         end
     end)
+    CHAOS.NOJUMP=true
 end
 effect.endfunc=function()
     if(CLIENT)then return end
     hook.Remove("SetupMove",hookname)
+    CHAOS.NOJUMP=false
 end
 effect.internalmul=0.5
 effect.name="NO Jump."
