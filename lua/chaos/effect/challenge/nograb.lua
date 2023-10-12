@@ -2,6 +2,7 @@ AddCSLuaFile()
 local effect=table.Copy(CHAOS.BASEEFFECT)
 local hookname="CHAOS_NoGrab"
 effect.startfunc=function()
+    CHAOS.ADDHOOK("PlayerCanPickupItem",hookname)
     hook.Add("PlayerCanPickupItem",hookname,function(ply,item)
         local normal=((ply:GetShootPos()+ply:GetAimVector()*-50)-item:GetPos()):GetNormalized()
         normal=normal*200
@@ -14,6 +15,7 @@ effect.startfunc=function()
         end
         return false
     end)
+    CHAOS.ADDHOOK("PlayerCanPickupWeapon",hookname)
     hook.Add("PlayerCanPickupWeapon",hookname,function(ply,item)
         local normal=((ply:GetShootPos()+ply:GetAimVector()*-50)-item:GetPos()):GetNormalized()
         normal=normal*200

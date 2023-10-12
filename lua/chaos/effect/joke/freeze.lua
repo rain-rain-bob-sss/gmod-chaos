@@ -4,6 +4,7 @@ local nextthink=3
 local hookname="Chaos_freezeondamaged"
 effect.startfunc=function(e)
     if(CLIENT)then return end
+    CHAOS.ADDHOOK("EntityTakeDamage",hookname)
     hook.Add("EntityTakeDamage",hookname,function(NPC,dmg)
         if(NPC:IsNPC())then
             local effectData = EffectData()

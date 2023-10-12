@@ -1,6 +1,6 @@
 AddCSLuaFile()
 local effect=table.Copy(CHAOS.BASEEFFECT)
-local hookname="CHAOS_2dskyboxrb"
+local hookname="CHAOS_dclm"
 effect.startfunc=function()
     if(SERVER)then return end
     local a=Material("model_color")
@@ -13,6 +13,6 @@ effect.endfunc=function()
     hook.Remove("PostDraw2DSkyBox",hookname)
 end
 effect.internalmul=0.8
-effect.name="Rainbow 2d skybox"
+effect.name="Discord light mode be like"
 effect.showeffecttime=false
 CHAOS.AddEffect(effect)

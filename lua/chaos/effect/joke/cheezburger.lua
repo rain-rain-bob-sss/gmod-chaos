@@ -3,6 +3,7 @@ local effect=table.Copy(CHAOS.BASEEFFECT)
 local hookname="Chaos_CHEEZBURGER"
 effect.startfunc=function()
     if(CLIENT)then return end
+    CHAOS.ADDHOOK("EntityFireBullets",hookname)
     hook.Add("EntityFireBullets",hookname,function(target,data)
         local cbg=ents.Create("prop_physics")
         if(cbg and cbg:IsValid())then

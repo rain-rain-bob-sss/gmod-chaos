@@ -5,6 +5,7 @@ local hookname="Chaos_explodeondamaged"
 local anticrash=0
 effect.startfunc=function(e)
     if(CLIENT)then return end
+    CHAOS.ADDHOOK("EntityTakeDamage",hookname)
     hook.Add("EntityTakeDamage",hookname,function(NPC,dmg)
         if(NPC:IsNPC())then
             local attacker=dmg:GetAttacker()

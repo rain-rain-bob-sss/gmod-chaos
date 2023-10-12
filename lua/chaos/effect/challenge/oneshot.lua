@@ -4,6 +4,7 @@ local dmgscale=50000
 local hookname="Chaos_ONESHOT"
 effect.startfunc=function()
     if(CLIENT)then return end
+    CHAOS.ADDHOOK("EntityTakeDamage",hookname)
     hook.Add("EntityTakeDamage",hookname,function(target,dmg)
         dmg:ScaleDamage(dmgscale)
     end)

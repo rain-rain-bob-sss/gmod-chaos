@@ -41,6 +41,7 @@ function CHAOS.AirMove(pl, mv) --Copyed from zs's wisp movement code,credit to j
 end
 local hookname="CHAOS_SWIMINAIR"
 effect.startfunc=function()
+	CHAOS.ADDHOOK("Move",hookname)
     hook.Add("Move",hookname,CHAOS.AirMove)
 end
 effect.endfunc=function()

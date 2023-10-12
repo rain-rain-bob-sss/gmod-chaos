@@ -18,6 +18,14 @@ CHAOS.READY=30--Time to ready.
 CHAOS.DELTATIME=0
 CHAOS.BHOP=true
 CHAOS.NOJUMP=false
+CHAOS.HOOK=CHAOS.HOOK or {}
+for en,tbl in pairs(CHAOS.HOOK)do
+    if(istable(tbl))then
+        for hn,_ in pairs(tbl)do
+            hook.Remove(en,hn)
+        end
+    end
+end
 --eugh!
 hook.Add("StartCommand","CHAOS_BHOPING",function(ply,cmd) 
     if(CHAOS.NOJUMP)then return end
@@ -44,7 +52,11 @@ CHAOS.EFFECT={
 
 }
 CHAOS.STOP=false
-CHAOS.CURRENT={}
+CHAOS.CURRENT=CHAOS.CURRENT or {}
+for i,v in pairs(CHAOS.CURRENT)do
+    v.endfunc(oldemt,oldpmt,oldemt,true)
+    CHAOS.CURRENT[i]=nil
+end
 function CHAOS.HANDLECONVAR(name,old,new)
     if(name=="chaos_duration")then
         CHAOS.DURATION=tonumber(new) or 40
@@ -58,6 +70,10 @@ function CHAOS.HANDLECONVAR(name,old,new)
             CHAOS.STOP=true
         end
     end
+end
+function CHAOS.ADDHOOK(eventname,hookname)
+    CHAOS.HOOK[eventname]=CHAOS.HOOK[eventname] or {}
+    CHAOS.HOOK[eventname][hookname]=true
 end
 local durationconvar=CreateConVar("chaos_duration",80,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"Base Duration of effects",0)
 local internalconvar=CreateConVar("chaos_internal",60,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"New Effect Internal",5)
@@ -139,14 +155,31 @@ local function IncludeDir( directory )
 		IncludeDir( directory .. v )
 	end
 end
-
+local nws3="chaos_reloadeffects"
 IncludeDir( effectDirectory )
 concommand.Add("chaos_reloadeffects",function(p)
     if(p==NULL or p:IsAdmin())then
         CHAOS.EFFECT={
             CHAOS.BASEEFFECT
         }
+        CHAOS.CURRENT={}
         IncludeDir( effectDirectory )
+        net.Start(nws3)
+        net.Broadcast()
+    end
+end)
+concommand.Add("chaos_fixupnpcthink",function(p)
+    if(p==NULL or p:IsAdmin())then
+        for i,v in pairs(ents.FindByClass("npc_*"))do
+            oldemt.NextThink(v,CurTime()+0.3)
+        end
+    end
+end)
+concommand.Add("chaos_fixcamera",function(p)
+    if(p==NULL or p:IsAdmin())then
+        for i,v in pairs(ents.FindByClass("point_viewcontrol"))do
+            v:Remove()
+        end
     end
 end)
 local tm=table.Copy(timer)
@@ -183,11 +216,26 @@ local function effectrunner()
         end
     end
 end
+CHAOS.CANSELECT=function(tbl)
+    if(tbl.CANSELECT)then
+        if(tbl.CANSELECT()==false)then
+            return false
+        end
+    end
+    return true
+end
 CHAOS.RANDOMFUNC=function()
     if(CLIENT)then return end
     if(CHAOS.STOP)then return end
-    if #CHAOS.CURRENT >= #CHAOS.EFFECT then 
-        return
+    local e={}
+    local count=0
+    for i,v in pairs(CHAOS.EFFECT)do
+        for i,v2 in pairs(CHAOS.CURRENT)do
+            if(v.name==v2.name and not e[v2.name])then
+                e[v2.name]=true
+                count=count+1
+            end
+        end
     end
     local selected=math.random(1,#CHAOS.EFFECT)
     local tbl=table.Copy(CHAOS.EFFECT[selected])
@@ -202,7 +250,13 @@ CHAOS.RANDOMFUNC=function()
             break
         end
     end
+    if(not CHAOS.CANSELECT(tbl))then
+        return false
+    end
     if(no)then
+        if(count==CHAOS.EFFECT)then
+            return
+        end
         CHAOS.RANDOMFUNC()
         return
     end
@@ -299,5 +353,10 @@ elseif(CLIENT)then
     end)
     net.Receive(nws2,function(_,_)
         CHAOS.CURRENT[net.ReadInt(32)].sec=net.ReadFloat()
+    end)
+    net.Receive(nws3,function(_,_)
+        CHAOS.EFFECT={}
+        CHAOS.CURRENT={}
+        IncludeDir( effectDirectory )
     end)
 end
