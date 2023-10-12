@@ -50,6 +50,7 @@ CHAOS.EFFECT={
 }
 CHAOS.STOP=false
 CHAOS.CURRENT=CHAOS.CURRENT or {}
+CHAOS.ADDHOOK=function() end
 for i,v in pairs(CHAOS.CURRENT)do
     v.endfunc(oldemt,oldpmt,oldemt,true)
     CHAOS.CURRENT[i]=nil
