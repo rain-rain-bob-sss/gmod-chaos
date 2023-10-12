@@ -18,8 +18,12 @@ end
 effect.internalmul=1.25
 effect.name="Trigger is solid"
 effect.showeffecttime=true
-hook.Add("Initialize","CHAOS_LOADSOLIDTRIGGEREFFECT",function()
-    if(#ents.FindByClass("trigger_*")>0)then
-        CHAOS.AddEffect(effect)
+local added=false
+hook.Add("OnEntityCreated","CHAOS_LOADSOLIDTRIGGEREFFECT",function(ent)
+    if(ent:IsValid() and string.StartsWith(string.lower(ent:GetClass()),"trigger_"))then
+        if(not added)then
+            CHAOS.AddEffect(effect)
+            added=true 
+        end
     end
 end)
