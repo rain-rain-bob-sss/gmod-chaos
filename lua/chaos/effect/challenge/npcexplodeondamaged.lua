@@ -9,7 +9,7 @@ effect.startfunc=function(e)
     hook.Add("EntityTakeDamage",hookname,function(NPC,dmg)
         if(NPC:IsNPC())then
             local attacker=dmg:GetAttacker()
-            if(attacker:IsNPC() and attacker:Health()<0 or attacker:Health()==0)then
+            if(attacker:IsNPC() and attacker:Health()<0 or attacker:Health()==0 or attacker==NPC)then
                 return
             end
             local effectData = EffectData()
