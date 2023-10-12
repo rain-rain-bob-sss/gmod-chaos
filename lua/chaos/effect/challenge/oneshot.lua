@@ -13,7 +13,7 @@ effect.endfunc=function()
     if(CLIENT)then return end
     hook.Remove("EntityTakeDamage",hookname)
 end
-effect.internalmul=2
+effect.internalmul=0.25
 effect.name="ONESHOT,OH NO!!!"
 effect.showeffecttime=true
 CHAOS.AddEffect(effect)

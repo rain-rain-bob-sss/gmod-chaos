@@ -14,19 +14,16 @@ end
 CHAOS.VERSION="beta_1.2"--in your custom effect you can check version
 CHAOS.DURATION=80
 CHAOS.INTERNAL=30
+CHAOS.CURRENTTIMELEFT=CHAOS.INTERNAL
 CHAOS.READY=30--Time to ready.
 CHAOS.DELTATIME=0
 CHAOS.BHOP=true
 CHAOS.NOJUMP=false
-CHAOS.HOOK=CHAOS.HOOK or {}
-for en,tbl in pairs(CHAOS.HOOK)do
-    if(istable(tbl))then
-        for hn,_ in pairs(tbl)do
-            hook.Remove(en,hn)
-        end
+for i,v in pairs(hook.GetTable())do
+    if(string.StartsWith(string.lower(i),"chaos_"))then
+        hook.Remove(i,v)
     end
 end
---eugh!
 hook.Add("StartCommand","CHAOS_BHOPING",function(ply,cmd) 
     if(CHAOS.NOJUMP)then return end
     if (bit.band(cmd:GetButtons(),IN_JUMP)~=0) then
@@ -71,25 +68,34 @@ function CHAOS.HANDLECONVAR(name,old,new)
         end
     end
 end
-function CHAOS.ADDHOOK(eventname,hookname)
-    CHAOS.HOOK[eventname]=CHAOS.HOOK[eventname] or {}
-    CHAOS.HOOK[eventname][hookname]=true
-end
 local durationconvar=CreateConVar("chaos_duration",80,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"Base Duration of effects",0)
 local internalconvar=CreateConVar("chaos_internal",60,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"New Effect Internal",5)
-local chaosconvar=CreateConVar("chaos",0,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"0 To disable,1 to enable",0,1)
+local chaosconvar=CreateConVar("chaos",1,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"0 To disable,1 to enable",0,1)
 cvars.AddChangeCallback("chaos_duration",CHAOS.HANDLECONVAR,"chaos_adcallback")
 cvars.AddChangeCallback("chaos_internalconvar",CHAOS.HANDLECONVAR,"chaos_bdcallback")
 cvars.AddChangeCallback("chaos",CHAOS.HANDLECONVAR,"chaos_cdcallback")
+local nws4="chaos_yellowbarpercent"
 if(CLIENT)then
+    CHAOS.yellowbarpercent=0
+    net.Receive(nws4,function(_,_)
+        CHAOS.yellowbarpercent=net.ReadFloat()
+    end)
     local fontname="chaos_font"
+    local gwidth=ScrW()
+    local gheight=ScrH()
+    local NScrW=function()
+        return gwidth
+    end
+    local NScrH=function()
+        return gheight
+    end
     --Some stupid dont update their gmod,fuck you.
     function ScreenScale( width )
-      return width * ( ScrW() / 640.0 )
+      return width * ( NScrW() / 640.0 )
     end
     
     function ScreenScaleH( height )
-      return height * ( ScrH() / 480.0 )
+      return height * ( NScrH() / 480.0 )
     end
     SScale = ScreenScale
     SScaleH = ScreenScaleH
@@ -108,7 +114,7 @@ if(CLIENT)then
       alladjust.x=alladjust.x+movevel.y*0.015
       alladjust.y=alladjust.y+movevel.x*0.005
     end)
-    hook.Add("PostDrawHUD","chaos_message_Drawing",function()
+    hook.Add("HUDPaint","chaos_message_Drawing",function()
       local co=0
       alladjust.x=Lerp(0.05,alladjust.x,0)
       alladjust.y=Lerp(0.05,alladjust.y,0)
@@ -126,6 +132,12 @@ if(CLIENT)then
         draw.DrawText(v.name.."   "..sec,fontname,ScrW()/2+SScale(100)+alladjust.x,ScrH()/2+-SScaleH(200)+alladjust.y+co,Color(255,255,0,200),TEXT_ALIGN_CENTER)
         co=co+h
       end
+    end)
+    hook.Add("HUDPaint","chaos_yellowbar",function()
+        local w=NScrW()*CHAOS.yellowbarpercent
+        --print(w)
+        surface.SetDrawColor(255,255,0,200)
+        surface.DrawRect(alladjust.x*0.2,alladjust.y*0.2,w,SScaleH(8))
     end)
   end
 --from gmod wiki
@@ -326,6 +338,8 @@ end)
 if(SERVER)then
     util.AddNetworkString(nws)
     util.AddNetworkString(nws2)
+    util.AddNetworkString(nws3)
+    util.AddNetworkString(nws4)
     hook.Add("PlayerInitialSpawn","CHAOS_MESSAGEONJOIN",function(p)
         if(CHAOS.DEV)then
             p:PrintMessage(HUD_PRINTTALK,"Warning! this server is running chaos-devmode,if you see this and no idea why this happen,tell [TW]Rain_bob.")
@@ -339,9 +353,25 @@ if(SERVER)then
             end
         end
     end)
-    local run=0
+    local run=0 
     tm.Simple(CHAOS.READY,function()
-        tm.Create("CHAOS_CHAOS ARE HAPPENING,OH NO!!!",CHAOS.INTERNAL,0,CHAOS.RANDOMFUNC)
+        --tm.Create("CHAOS_CHAOS ARE HAPPENING,OH NO!!!",CHAOS.INTERNAL,0,CHAOS.RANDOMFUNC)
+        hook.Add("Think","CHAOS_THINK",function()
+            CHAOS.CURRENTTIMELEFT=CHAOS.CURRENTTIMELEFT-1*FrameTime()
+            if(not CHAOS.STOP)then
+                net.Start(nws4)
+                net.WriteFloat(CHAOS.CURRENTTIMELEFT/CHAOS.INTERNAL)
+                net.Broadcast()
+            else
+                net.Start(nws4)
+                net.WriteFloat(0)
+                net.Broadcast()
+            end
+            if(CHAOS.CURRENTTIMELEFT<0)then
+                CHAOS.CURRENTTIMELEFT=CHAOS.INTERNAL
+                CHAOS.RANDOMFUNC()
+            end
+        end)
     end)
 elseif(CLIENT)then
     net.Receive(nws,function(_,_)
@@ -352,7 +382,10 @@ elseif(CLIENT)then
         print(CHAOS.EFFECT[selected].name)
     end)
     net.Receive(nws2,function(_,_)
-        CHAOS.CURRENT[net.ReadInt(32)].sec=net.ReadFloat()
+        local tbl=CHAOS.CURRENT[net.ReadInt(32)]
+        if(tbl)then
+            tbl.sec=net.ReadFloat()
+        end
     end)
     net.Receive(nws3,function(_,_)
         CHAOS.EFFECT={}
