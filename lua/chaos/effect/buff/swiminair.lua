@@ -48,7 +48,7 @@ effect.endfunc=function()
     hook.Remove("Move",hookname)
 end
 effect.internalmul=0.9
-effect.name="Swiming in air"
+effect.name="Swimming in air"
 effect.showeffecttime=true
 CHAOS.AddEffect(effect)
 

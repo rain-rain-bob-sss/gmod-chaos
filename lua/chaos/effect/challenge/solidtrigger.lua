@@ -47,4 +47,4 @@ end
 effect.internalmul=1.25
 effect.name="Trigger is solid"
 effect.showeffecttime=true
-CHAOS.ADDEFFECT(effect)
+CHAOS.AddEffect(effect)

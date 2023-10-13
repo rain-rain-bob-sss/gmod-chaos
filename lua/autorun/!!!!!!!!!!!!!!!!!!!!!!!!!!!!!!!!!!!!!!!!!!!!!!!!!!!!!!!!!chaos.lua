@@ -135,7 +135,7 @@ if(CLIENT)then
       end
     end)
     hook.Add("HUDPaint","chaos_yellowbar",function()
-        local w=NScrW()*CHAOS.yellowbarpercent
+        local w=NScrW()*(math.abs(CHAOS.yellowbarpercent-1))
         --print(w)
         surface.SetDrawColor(255,255,0,200)
         surface.DrawRect(alladjust.x*0.2,alladjust.y*0.2,w,SScaleH(8))
