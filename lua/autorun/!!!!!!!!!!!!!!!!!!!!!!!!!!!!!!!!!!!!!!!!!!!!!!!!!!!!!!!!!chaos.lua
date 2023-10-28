@@ -142,16 +142,23 @@ if(CLIENT)then
     end)
   end
 --from gmod wiki
-
 local effectDirectory = "chaos/effect"
+local neweffectDirectory = "chaos/neweffect" --New way to add effect.
+CEFFECT=CHAOS.BASEEFFECT
 local function AddFile( File, directory )
 	local prefix = string.lower( string.Left( File, 3 ) )
+    local old=true
     --if(SERVER)then
+        CEFFECT=CHAOS.BASEEFFECT
         include( directory .. File )
+        if(CHAOSEFFECT~=CHAOS.BASEEFFECT)then
+            CHAOS.AddEffect(CHAOSEFFECT)
+            old=false
+        end
+        CEFFECT=CHAOS.BASEEFFECT
     --end
-    print("CHAOS [AUTOLOAD] FILE: "..directory..File)
+    print(string.format("CHAOS [AUTOLOAD]%s FILE: ",old and "[Legacy]")..directory..File)
 end
-
 local function IncludeDir( directory )
 	directory = directory .. "/"
 
@@ -170,13 +177,14 @@ local function IncludeDir( directory )
 end
 local nws3="chaos_reloadeffects"
 IncludeDir( effectDirectory )
+IncludeDir( neweffectDirectory )
 concommand.Add("chaos_reloadeffects",function(p)
     if(p==NULL or p:IsAdmin())then
         CHAOS.EFFECT={
-            CHAOS.BASEEFFECT
         }
         CHAOS.CURRENT={}
         IncludeDir( effectDirectory )
+        IncludeDir( neweffectDirectory )
         net.Start(nws3)
         net.Broadcast()
     end
@@ -348,7 +356,7 @@ if(SERVER)then
         for i,v in pairs(CHAOS.CURRENT)do
             if(v)then
                 net.Start(nws)
-                net.WriteInt(index,32)
+                net.WriteInt(i,32)
                 net.WriteInt(v.numforsend,32)
                 net.Broadcast()
             end
@@ -392,5 +400,6 @@ elseif(CLIENT)then
         CHAOS.EFFECT={}
         CHAOS.CURRENT={}
         IncludeDir( effectDirectory )
+        IncludeDir( neweffectDirectory )
     end)
 end
