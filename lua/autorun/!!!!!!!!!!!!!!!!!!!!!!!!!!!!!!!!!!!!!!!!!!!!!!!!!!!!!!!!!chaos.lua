@@ -41,6 +41,7 @@ CHAOS.BASEEFFECT={ --use table.Copy(CHAOS.BASEEFFECT),if you use this as base cl
     tickfunc=function(e,p,w) return end,
     endfunc=function() return end,
     internalmul=1,
+    durationmul=1,
     showeffecttime=true,
     name="Nothing,kid.",
 }
@@ -157,7 +158,7 @@ local function AddFile( File, directory )
         end
         CEFFECT=CHAOS.BASEEFFECT
     --end
-    print(string.format("CHAOS [AUTOLOAD]%s FILE: ",old and "[Legacy]")..directory..File)
+    print(string.format("CHAOS [AUTOLOAD]%s FILE: ",(old and "[Legacy]" or ""))..directory..File)
 end
 local function IncludeDir( directory )
 	directory = directory .. "/"
@@ -210,7 +211,7 @@ local function effectrunner()
     for i,v in pairs(CHAOS.CURRENT)do
         if(v==nil)then continue end
         if(v.sec==nil)then
-            v.sec=CHAOS.DURATION*v.internalmul
+            v.sec=CHAOS.DURATION*(v.internalmul or v.durationmul or 1)
         end
         if(not v.firstruned)then
             v.firstruned=true
