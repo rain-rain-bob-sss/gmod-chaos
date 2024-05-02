@@ -7,7 +7,7 @@ local oldpmt=oldpmt or table.Copy(FindMetaTable("Player"))
 local oldwmt=oldwmt or table.Copy(FindMetaTable("Weapon"))
 CHAOS={}
 print(CHAOS," CHAOS TABLE LOADED")
-CHAOS.DEV=true
+CHAOS.DEV=false
 CHAOS.AddEffect=function(ED)
     table.insert(CHAOS.EFFECT,ED)
 end
@@ -49,7 +49,7 @@ CHAOS.BASEEFFECT={ --use table.Copy(CHAOS.BASEEFFECT),if you use this as base cl
 CHAOS.EFFECT={
 
 }
-CHAOS.STOP=false
+CHAOS.STOP=true
 CHAOS.CURRENT=CHAOS.CURRENT or {}
 CHAOS.ADDHOOK=function() end
 for i,v in pairs(CHAOS.CURRENT)do
@@ -72,7 +72,7 @@ function CHAOS.HANDLECONVAR(name,old,new)
 end
 local durationconvar=CreateConVar("chaos_duration",80,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"Base Duration of effects",0)
 local internalconvar=CreateConVar("chaos_internal",60,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"New Effect Internal",5)
-local chaosconvar=CreateConVar("chaos",1,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"0 To disable,1 to enable",0,1)
+local chaosconvar=CreateConVar("chaos",0,FCVAR_GAMEDLL+524288+FCVAR_REPLICATED+FCVAR_NOTIFY,"0 To disable,1 to enable",0,1)
 cvars.AddChangeCallback("chaos_duration",CHAOS.HANDLECONVAR,"chaos_adcallback")
 cvars.AddChangeCallback("chaos_internalconvar",CHAOS.HANDLECONVAR,"chaos_bdcallback")
 cvars.AddChangeCallback("chaos",CHAOS.HANDLECONVAR,"chaos_cdcallback")
@@ -374,7 +374,7 @@ if(SERVER)then
                 net.Broadcast()
             else
                 net.Start(nws4)
-                net.WriteFloat(0)
+                net.WriteFloat(1)
                 net.Broadcast()
             end
             if(CHAOS.CURRENTTIMELEFT<0)then

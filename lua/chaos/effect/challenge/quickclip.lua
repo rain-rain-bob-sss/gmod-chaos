@@ -18,7 +18,7 @@ if(enabled)then
             end
         end
     end
-    effect.internalmul=CHAOS.DURATION
+    effect.internalmul=40/CHAOS.DURATION
     effect.name="Quick clip"
     effect.showeffecttime=true
     CHAOS.AddEffect(effect)
